@@ -1,239 +1,93 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-	<head>
-		<title>SSH Network Traffic Side-Channel Demo</title>
-		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	</head>
-	<body>
-		<script src="Chart.js"></script>
-		<script>
-			function drawMyChart(wndw) {
-				var ctx = document.getElementById("myChart").getContext("2d");
-				var myChart = new Chart(ctx, {
-					type: 'scatter',
-					data: {
-						datasets: [{
-							label: 'TCP Payload Size',
-							data: wndw,
-							backgroundColor: 'rgba(0, 0, 0, 0.1)',
-							borderColor: 'rgba(255, 0, 0, 1)',
-							borderWidth: 1,
-							showLine: true
-						}]
-					},
-					options: {
-						scales: {
-							yAxes: [{
-									ticks: {
-										beginAtZero: true
-									},
-									labelString: 'Payload Size (bytes)'
-								}]
-							},
-							xAxes: [{
-								display: true,
-								labelString: 'Time (ms)'
-							}],
-							responsive: true,
-							maintainAspectRatio: false,
-							events: []
-						}
-					});
-			}
-			
-			var traffic_window = [];
-			function update_chart(payload_sz) {
-				var dt = new Date();
-				var t = dt.getTime();
-				traffic_window.push({
-					x: t,
-					y: payload_sz
-				});
-				traffic_window = traffic_window.slice(-10);
-				drawMyChart(traffic_window);
-			}
-			
-			var user_instructions = [
-				"Please wait for the message `Could not load host key: /etc/ssh/ssh host ed25519 key` to appear in the System Monitor. Then click here to continue",
-				"In the System Monitor, execute the command `adduser test`. Choose a password such as Test55. Then click here to continue",
-				"In the System Monitor, execute the command `ifconfig eth0 192.168.1.1`. Then click here to continue",
-				"In the System Monitor, execute the command `ssh test@192.168.1.2`. Then click here to continue",
-				"Wait for the message `Are you sure to want to continue connecting (yes/no)` to appear in the System Serial Console. Type yes into the System Serial Console, press Enter, then click here to continue",
-				"Enter the password (eg. Test55) into the serial console at the password prompt (no characters will be displayed) and press enter. Then click here to continue.",
-				"You will get a remote console prompt `(none):$` in the System Monitor. Interact with it. Examine the graph and the Network Log. Notice any patterns? How about records with LENGTH: 36?"
-				
-			];
-			var user_instruction_index = 0
-			function nextUserInstruction() {
-				document.getElementById("instruction_display").value = user_instructions[user_instruction_index];
-				if ((user_instruction_index + 1) != user_instructions.length) {
-					user_instruction_index += 1;
-				}
-			}
-			
-		</script>
-		
-		<script src="build/libv86.js"></script>
-		<script>
-			"use strict";
-			
-			var netconsole = false;
-			function vm_tx_callback(data) {
-				if (netconsole == false) {
-					netconsole = document.getElementById("netconsole");
-				}
-				
-				var eth_dst_mac = data.slice(0, 6);
-				var eth_src_mac = data.slice(6, 12);
-				var ether_type = data.slice(12, 14);
-				var ether_options = data.slice(14, 20);
-				var opcode = data.slice(20, 22);
-				var src_mac = data.slice(22, 28);
-				var src_ip = data.slice(28, 32);
-				var dst_mac = data.slice(32, 38);
-				var dst_ip = data.slice(38, 42);
-				var frame_remainder = data.slice(42);
-				
-				if (ether_type[0] == 0x08 && ether_type[1] == 0x06) {
-					//ARP Packet...generate a reply
-					var re_src_mac = [12, 34, 56, 65, 43, 21];
-					var re_dst_mac = src_mac.slice();
-					var re_opcode = [0, 2]; //ARP REPLY
-					var re_dst_ip = src_ip.slice();
-					var re_src_ip = dst_ip.slice();
-					
-					var reply_packet = [];
-					for (var i = 0; i < re_dst_mac.length; i++)
-						reply_packet.push(re_dst_mac[i]);
-					
-					for (var i = 0; i < re_src_mac.length; i++)
-						reply_packet.push(re_src_mac[i]);
-					
-					for (var i = 0; i < ether_type.length; i++)
-						reply_packet.push(ether_type[i]);
-					
-					for (var i = 0; i < ether_options.length; i++)
-						reply_packet.push(ether_options[i]);
-					
-					for (var i = 0; i < re_opcode.length; i++)
-						reply_packet.push(re_opcode[i]);
-					
-					for (var i = 0; i < re_src_mac.length; i++)
-						reply_packet.push(re_src_mac[i]);
-					
-					for (var i = 0; i < re_src_ip.length; i++)
-						reply_packet.push(re_src_ip[i]);
-					
-					for (var i = 0; i < re_dst_mac.length; i++)
-						reply_packet.push(re_dst_mac[i]);
-					
-					for (var i = 0; i < re_dst_ip.length; i++)
-						reply_packet.push(re_dst_ip[i]);
-					
-					for (var i = 0; i < frame_remainder.length; i++)
-						reply_packet.push(frame_remainder[i]);
-					
-					netconsole.value += "[ARP] Setting host " + dst_ip[0] + "." + dst_ip[1] + "." + dst_ip[2] + "." + dst_ip[3] + " as 0C:22:38:41:2B:15.\n";
-					
-					return reply_packet;
-				}
-				
-				else if (ether_type[0] == 0x08 && ether_type[1] == 0x00) {
-					//IPv4 packet
-					//console.log("IPv4:" + data);
-					var ipv4_proto = data[23];
-					var ipv4_src = data.slice(26,30);
-					var ipv4_dst = data.slice(30,34);
-					
-					//TCP Protocol
-					if (ipv4_proto == 0x06) {
-						var tcp_sport = 256*data[34] + 1*data[35];
-						var tcp_dport = 256*data[36] + 1*data[37];
-						var payload_size = data.length - 20 - 20 - 26;
-						netconsole.value += "[TCP/IPv4] SOURCE: " + ipv4_src[0] + "." + ipv4_src[1] + "." + ipv4_src[2] + "." + ipv4_src[3] + ":" + tcp_sport + "  DEST: " + ipv4_dst[0] + "." + ipv4_dst[1] + "." + ipv4_dst[2] + "." + ipv4_dst[3] + ":" + tcp_dport + "  LENGTH: " + payload_size + "\n";
-						
-						//Visualization
-						update_chart(payload_size);
-						
-						var newpacket = data.slice();
-						//SWAP: (MAC SRC) with (MAC DST)
-						//Do DST MAC (newpacket[0:6])...
-						newpacket[0] = data[6];
-						newpacket[1] = data[7];
-						newpacket[2] = data[8];
-						newpacket[3] = data[9];
-						newpacket[4] = data[10];
-						newpacket[5] = data[11];
-						
-						//Do SRC MAC (newpacket[6:12])...
-						newpacket[6] = data[0];
-						newpacket[7] = data[1];
-						newpacket[8] = data[2];
-						newpacket[9] = data[3];
-						newpacket[10] = data[4];
-						newpacket[11] = data[5];
-						
-						
-						//SWAP: (IP SRC) with (IP DST)
-						//Do SRC IP (newpacket[26:30])
-						newpacket[26] = data[30];
-						newpacket[27] = data[31];
-						newpacket[28] = data[32];
-						newpacket[29] = data[33];
-						
-						//Do DST IP (newpacket[30:34])
-						newpacket[30] = data[26];
-						newpacket[31] = data[27];
-						newpacket[32] = data[28];
-						newpacket[33] = data[29];
-						
-						return newpacket;
-					}
-					else {
-						netconsole.value += "[IPv4] SOURCE: " + ipv4_src[0] + "." + ipv4_src[1] + "." + ipv4_src[2] + "." + ipv4_src[3] + "  DEST: " + ipv4_dst[0] + "." + ipv4_dst[1] + "." + ipv4_dst[2] + "." + ipv4_dst[3] + "\n";
-					}
-				}
-				return [];
-			}
-			
-			window.onload = function() {
-				//Initialize chart
-				update_chart(0);
-				
-				//Initialize interactive user instructions
-				nextUserInstruction();
-				
-				var container_client = document.getElementById("screen_client");
-				var container_tty = document.getElementById("serial_tty");
-				
-				var emulator_client = new V86Starter({
-					screen_container: container_client,
-					serial_container: container_tty,
-					memory_size: 536870912,
-					bios: {
-						url: "bios/seabios.bin"
-					},
-					vga_bios: {
-						url: "bios/vgabios.bin"
-					},
-					cdrom: {
-						url: "bootable.iso"
-					},
-					autostart: true,
-					network_relay_url: vm_tx_callback,
-				});
-				
-				emulator_client.add_listener("net0-receive", function(netbuffer) {
-					console.log("Rx network packet from VM.");
-				});
-				
-				emulator_client.keyboard_set_status(true);
-			};
-		</script>
-		
-		<h1>SSH Network Traffic Side-Channel Demo</h1>
+  <head>
+    <title>SSH Network Traffic Side-Channel Demo</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/4/flatly/bootstrap.css"
+    />
+    <script src="Chart.js"></script>
+    <script src="./js/drawChart.js"></script>
+    <script src="build/libv86.js"></script>
+    <script src="./js/vm.js"></script>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-primary">
+      <a class="navbar-brand text-center" href="#">
+        SSH Network Traffic Side-Channel Demo
+      </a>
+    </nav>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="card col-lg-6">
+            <div class="card-body">
+              <h3 class="card-title">System Monitor</h3>
+              <div id="screen_client">
+                <div
+                  style="white-space: pre; font: 14px monospace; line-height: 14px"
+                ></div>
+                <canvas style="display: none"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card col-lg-3">
+            <div class="card-body">
+              <h3 class="card-title">System Serial Console</h3>
+              <p
+                id="serial_tty"
+                style="height: 350px; border: 1px solid black"
+              ></p>
+            </div>
+          </div>
+          <div class="card col-lg-2">
+            <div class="card-body">
+              <h3 class="card-title">Network Log</h3>
+              <p
+                id="netconsole"
+                style="height: 350px; border: 1px solid black"
+              ></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="card col-lg-4">
+            <div class="card-body">
+              <canvas id="myChart" width="650" height="400"></canvas>
+            </div>
+          </div>
+
+          <div class="card col-lg-7">
+            <div class="card-body">
+              <div>
+                <button
+                  id="prevBtn"
+                  class="btn btn-primary"
+                  onclick="prevUserInstruction()"
+                  disabled
+                >
+                  Prev
+                </button>
+                <button
+                  id="nextBtn"
+                  class="btn btn-primary"
+                  onclick="nextUserInstruction()"
+                >
+                  Next
+                </button>
+                <p id="instruction_display"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <h1>SSH Network Traffic Side-Channel Demo</h1>
 		
 		<table>
 			<tr>
@@ -266,11 +120,9 @@
 					<table>
 						<tr>
 							<td>
-								<!--Graph Goes Here-->
 								<canvas id="myChart" width="650" height="400"></canvas>
 							</td>
 							<td>
-								<!--Instructions go here-->
 								<div style="float: left; margin: 10px; border: 5px solid blue;" onclick="nextUserInstruction()">
 									<textarea id="instruction_display" style="width: 750px; height: 400px; font-size: 20px;" readonly="readonly"></textarea>
 								</div>
@@ -279,5 +131,6 @@
 					</table>
 				</td>
 			</tr>
-	</body>
+		</table> -->
+  </body>
 </html>
