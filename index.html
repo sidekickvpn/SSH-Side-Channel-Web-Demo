@@ -26,7 +26,7 @@
           <div class="card col-lg-6">
             <div class="card-body">
               <h3 class="card-title">System Monitor</h3>
-              <div id="screen_client">
+              <div id="screen_client" style="margin-right: 1em;">
                 <div
                   style="white-space: pre; font: 14px monospace; line-height: 14px"
                 ></div>
@@ -38,31 +38,32 @@
           <div class="card col-lg-3">
             <div class="card-body">
               <h3 class="card-title">System Serial Console</h3>
-              <p
+              <textarea
                 id="serial_tty"
-                style="height: 350px; border: 1px solid black"
-              ></p>
+                style="height: 350px; width: 100%; border: 1px solid black; white-space: nowrap;"
+              ></textarea>
             </div>
           </div>
           <div class="card col-lg-2">
             <div class="card-body">
               <h3 class="card-title">Network Log</h3>
-              <p
+              <textarea
                 id="netconsole"
-                style="height: 350px; border: 1px solid black"
-              ></p>
+                style="height: 350px; width: 100%; border: 1px solid black; white-space: nowrap;"
+                readonly="readonly"
+              ></textarea>
             </div>
           </div>
         </div>
 
         <div class="row">
-          <div class="card col-lg-4">
+          <div class="card col-lg-7">
             <div class="card-body">
               <canvas id="myChart" width="650" height="400"></canvas>
             </div>
           </div>
 
-          <div class="card col-lg-7">
+          <div class="card col-lg-4">
             <div class="card-body">
               <div>
                 <button
