@@ -53,7 +53,7 @@ function vm_tx_callback(data) {
     for (var i = 0; i < frame_remainder.length; i++)
       reply_packet.push(frame_remainder[i]);
 
-    netconsole.value +=
+    netconsole.innerHTML +=
       '[ARP] Setting host ' +
       dst_ip[0] +
       '.' +
@@ -77,7 +77,7 @@ function vm_tx_callback(data) {
       var tcp_sport = 256 * data[34] + 1 * data[35];
       var tcp_dport = 256 * data[36] + 1 * data[37];
       var payload_size = data.length - 20 - 20 - 26;
-      netconsole.value +=
+      netconsole.innerHTML +=
         '[TCP/IPv4] SOURCE: ' +
         ipv4_src[0] +
         '.' +
@@ -138,7 +138,7 @@ function vm_tx_callback(data) {
 
       return newpacket;
     } else {
-      netconsole.value +=
+      netconsole.innerHTML +=
         '[IPv4] SOURCE: ' +
         ipv4_src[0] +
         '.' +
