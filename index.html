@@ -1,94 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <title>SSH Network Traffic Side-Channel Demo</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <link
-      rel="stylesheet"
-      href="https://bootswatch.com/4/flatly/bootstrap.css"
-    />
-    <script src="Chart.js"></script>
-    <script src="./js/drawChart.js"></script>
-    <script src="build/libv86.js"></script>
-    <script src="./js/vm.js"></script>
-    <link rel="stylesheet" href="./css/style.css" />
-  </head>
-  <body>
-    <nav class="navbar navbar-dark bg-primary">
-      <a class="navbar-brand text-center" href="#">
-        SSH Network Traffic Side-Channel Demo
-      </a>
-    </nav>
-    <div class="card">
-      <div class="card-body">
-        <div class="row">
-          <div class="card col-lg-6">
-            <div class="card-body">
-              <h3 class="card-title">System Monitor</h3>
-              <div id="screen_client" style="margin-right: 1em;">
-                <div
-                  style="white-space: pre; font: 14px monospace; line-height: 14px"
-                ></div>
-                <canvas style="display: none"></canvas>
-              </div>
-            </div>
-          </div>
+	<head>
+		<title>SSH Network Traffic Side-Channel Demo</title>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<link
+			rel="stylesheet"
+			href="https://bootswatch.com/4/flatly/bootstrap.css"
+		/>
+		<script src="Chart.js"></script>
+		<script src="./js/drawChart.js"></script>
+		<script src="build/libv86.js"></script>
+		<script src="./js/vm.js"></script>
+		<link rel="stylesheet" href="./css/style.css" />
+	</head>
+	<body>
+		<nav class="navbar navbar-dark bg-primary">
+			<a class="navbar-brand text-center" href="#">
+				SSH Network Traffic Side-Channel Demo
+			</a>
+		</nav>
+		<div class="card">
+			<div class="card-body">
+				<div class="row">
+					<div class="card col-lg-6">
+						<div class="card-body">
+							<h3 class="card-title">System Monitor</h3>
+							<div id="screen_client" style="margin-right: 1em;">
+								<div
+									style="white-space: pre; font: 14px monospace; line-height: 14px"
+								></div>
+								<canvas style="display: none"></canvas>
+							</div>
+						</div>
+					</div>
 
-          <div class="card col-lg-3">
-            <div class="card-body">
-              <h3 class="card-title">System Serial Console</h3>
-              <textarea
-                id="serial_tty"
-                style="height: 350px; width: 100%; border: 1px solid black; white-space: nowrap;"
-              ></textarea>
-            </div>
-          </div>
-          <div class="card col-lg-2">
-            <div class="card-body">
-              <h3 class="card-title">Network Log</h3>
-              <textarea
-                id="netconsole"
-                style="height: 350px; width: 100%; border: 1px solid black; white-space: nowrap;"
-                readonly="readonly"
-              ></textarea>
-            </div>
-          </div>
-        </div>
+					<div class="card col-lg-3">
+						<div class="card-body">
+							<h3 class="card-title">System Serial Console</h3>
+							<textarea
+								id="serial_tty"
+								style="height: 350px; width: 100%; border: 1px solid black; white-space: nowrap;"
+							></textarea>
+						</div>
+					</div>
+					<div class="card col-lg-2">
+						<div class="card-body">
+							<h3 class="card-title">Network Log</h3>
+							<textarea
+								id="netconsole"
+								style="height: 350px; width: 100%; border: 1px solid black; white-space: nowrap;"
+							></textarea>
+						</div>
+					</div>
+				</div>
 
-        <div class="row">
-          <div class="card col-lg-7">
-            <div class="card-body">
-              <canvas id="myChart" width="650" height="400"></canvas>
-            </div>
-          </div>
+				<div class="row">
+					<div class="card col-lg-7">
+						<div class="card-body">
+							<canvas id="myChart" width="650" height="400"></canvas>
+						</div>
+					</div>
 
-          <div class="card col-lg-4">
-            <div class="card-body">
-              <div>
-                <button
-                  id="prevBtn"
-                  class="btn btn-primary"
-                  onclick="prevUserInstruction()"
-                  disabled
-                >
-                  Prev
-                </button>
-                <button
-                  id="nextBtn"
-                  class="btn btn-primary"
-                  onclick="nextUserInstruction()"
-                >
-                  Next
-                </button>
-                <p id="instruction_display"></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- <h1>SSH Network Traffic Side-Channel Demo</h1>
+					<div class="card col-lg-4">
+						<div class="card-body">
+							<div>
+								<button
+									id="prevBtn"
+									class="btn btn-primary"
+									onclick="prevUserInstruction()"
+									disabled
+								>
+									Prev
+								</button>
+								<button
+									id="nextBtn"
+									class="btn btn-primary"
+									onclick="nextUserInstruction()"
+								>
+									Next
+								</button>
+								<p id="instruction_display"></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <h1>SSH Network Traffic Side-Channel Demo</h1>
 		
 		<table>
 			<tr>
@@ -133,5 +132,5 @@
 				</td>
 			</tr>
 		</table> -->
-  </body>
+	</body>
 </html>
