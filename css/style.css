@@ -1,3 +1,64 @@
 .card {
   margin: 0.5em;
 }
+
+.card {
+  margin: 0.5em;
+}
+
+@font-face {
+	font-family: Gotham;  
+	src: url('http://159.203.3.10/wp-content/themes/ChildThemeDivi/fonts/Gotham-Book.otf');  
+	font-weight: normal;  
+}
+@font-face {
+	font-family: Gotham;  
+	src: url('http://159.203.3.10/wp-content/themes/ChildThemeDivi/fonts/Gotham-Bold.otf');  
+	font-weight: 800;  
+}
+
+body{
+    font-family: Gotham!important;
+    font-weight: normal!important;
+    color:#333!important;
+}
+
+.card {
+ border:   2px solid #dfdfdf;
+    border-radius: 1px!important;
+}
+
+.card-title{
+    font-size: 18px;
+}
+
+.card .card-body{
+    border:0px!important;
+}
+
+.bg-primary{
+    background-color: #4260ac!important;
+}
+
+#serial_tty{
+    
+}
+
+#nextBtn{
+    background-color:#4260ac !important;
+    border:1px  solid #4260ac!important;
+}
+
+#prevBtn{
+    background-color:transparent!important;
+    border:1px solid #4260ac!important;
+    color:#4260ac!important;
+}
+
+#prevBtn a {
+    
+}
+#instruction_display{
+    margin-top:20px;
+}
+
